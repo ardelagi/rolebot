@@ -68,7 +68,12 @@ class TempDataManager:
     def __init__(self):
         self.data = {}
         self.timestamps = {}
-        self.cleanup_task.start()
+        self._task_started = False
+    
+    def start_cleanup(self):
+        if not self._task_started:
+            self.cleanup_task.start()
+            self._task_started = True
     
     def set(self, user_id: int, data: dict):
         self.data[user_id] = data
