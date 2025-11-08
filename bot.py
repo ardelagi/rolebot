@@ -351,13 +351,16 @@ temp_data_manager = TempDataManager()
 @bot.event
 async def on_ready():
     print(f"✅ Logged in as {bot.user}")
+    temp_data_manager.start_cleanup()
     bot.add_view(RoleManagementView(temp_data_manager))
     
     await restore_panel()
     
     try:
-        synced = await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
-        print(f"✅ Synced {len(synced)} command(s)")
+        guild = discord.Object(id=GUILD_ID)
+        bot.tree.copy_global_to(guild=guild)
+        synced = await bot.tree.sync(guild=guild)
+        print(f"✅ Synced {len(synced)} command(s) to guild {GUILD_ID}")
     except Exception as e:
         print(f"❌ Failed to sync commands: {e}")
 
