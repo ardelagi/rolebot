@@ -631,7 +631,7 @@ async def rekening_command(ctx):
     
     embed.add_field(
         name="Bank",
-        value="Jenius",
+        value="SMBC Indonesia",
         inline=False
     )
     
