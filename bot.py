@@ -625,13 +625,13 @@ async def rekening_command(ctx):
     
     embed.add_field(
         name="Nomor Rekening",
-        value="`003042176460`",
+        value="`90190172055`",
         inline=False
     )
     
     embed.add_field(
         name="Bank",
-        value="BLU BY BCA / BCA DIGITAL",
+        value="Jenius",
         inline=False
     )
     
