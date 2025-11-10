@@ -249,21 +249,30 @@ class RoleManagementView(discord.ui.View):
         action = temp_data['action']
         role = interaction.guild.get_role(role_id)
 
+        # PERBAIKAN: Defer immediately untuk menghindari timeout
+        await interaction.response.defer(ephemeral=True)
+
         # Confirmation for bulk actions (more than 3 users)
         if len(selected_user_ids) > 3:
             confirm_view = ConfirmButton()
-            await interaction.response.send_message(
+            confirm_message = await interaction.followup.send(
                 f"⚠️ You are about to **{action}** {role.mention} for **{len(selected_user_ids)} members**.\n\n"
                 "Are you sure?",
                 view=confirm_view,
-                ephemeral=True
+                ephemeral=True,
+                wait=True
             )
             
             await confirm_view.wait()
             if not confirm_view.value:
+                await confirm_message.edit(content="❌ Action cancelled", view=None)
                 return
-        else:
-            await interaction.response.defer(ephemeral=True)
+            
+            # Delete confirmation message
+            try:
+                await confirm_message.delete()
+            except:
+                pass
 
         # Process actions
         success_list = []
@@ -327,10 +336,8 @@ class RoleManagementView(discord.ui.View):
             inline=True
         )
 
-        if len(selected_user_ids) > 3:
-            await interaction.followup.send(embed=summary_embed, ephemeral=True)
-        else:
-            await interaction.followup.send(embed=summary_embed, ephemeral=True)
+        # Send result to user
+        await interaction.followup.send(embed=summary_embed, ephemeral=True)
 
         # Send to log channel
         log_channel = interaction.guild.get_channel(LOG_CHANNEL_ID)
@@ -605,6 +612,38 @@ async def role_stats(interaction: discord.Interaction):
     embed.set_footer(text=f"Total: {total_with_roles} members • Requested by {interaction.user.name}")
     
     await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
+@bot.command(name="rek")
+async def rekening_command(ctx):
+    """Command !rek untuk menampilkan informasi rekening"""
+    embed = discord.Embed(
+        title="💳 Rekening",
+        color=discord.Color.blue(),
+        timestamp=discord.utils.utcnow()
+    )
+    
+    embed.add_field(
+        name="Nomor Rekening",
+        value="`003042176460`",
+        inline=False
+    )
+    
+    embed.add_field(
+        name="Bank",
+        value="BLU BY BCA / BCA DIGITAL",
+        inline=False
+    )
+    
+    embed.add_field(
+        name="Atas Nama",
+        value="Rio Djaja",
+        inline=False
+    )
+    
+    embed.set_footer(text="Motion County Donation")
+    
+    await ctx.send(embed=embed)
 
 
 @bot.tree.command(name="delete_panel", description="Delete saved panel message ID (Admin only)")
