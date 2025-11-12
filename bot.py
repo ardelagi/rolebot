@@ -657,13 +657,13 @@ async def rumah_command(ctx):
     
     embed.add_field(
         name="1. Pilih Rumah",
-        value="Tentukan rumah yang akan dibeli dengan mencari di IC rumah dengan **pintu terbuka**",
+        value="Tentukan rumah yang akan dibeli dengan mencari di IC rumah dengan pintu terbuka\n\u200b",
         inline=False
     )
     
     embed.add_field(
         name="2. Kategori Rumah",
-        value="Rumah yang akan dibeli akan ditentukan kategori oleh manajemen termasuk small, medium, big, mansion.",
+        value="Rumah yang akan dibeli akan ditentukan kategori oleh manajemen termasuk small, medium, big, mansion.\n\u200b",
         inline=False
     )
     
@@ -673,13 +673,13 @@ async def rumah_command(ctx):
             "Pihak server akan menentukan harga berdasarkan kategori:\n"
             "**Small** - Mulai dari `Rp 750,000`\n"
             "**Medium** - Mulai dari `Rp 2,500,000`\n"
-            "**Big & Mansion** - Mulai dari `Rp 5,000,000`"
+            "**Big & Mansion** - Mulai dari `Rp 5,000,000`\n\u200b"
         ),
         inline=False
     )
     
     embed.add_field(
-        name="Biaya Maintenance",
+        name="4. Biaya Maintenance",
         value="Mansion memiliki biaya maintenance **Rp 350,000/bulan**",
         inline=False
     )
