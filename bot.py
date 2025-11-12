@@ -644,6 +644,49 @@ async def rekening_command(ctx):
     embed.set_footer(text="Motion County Donation")
     
     await ctx.send(embed=embed)
+    
+    
+@bot.command(name="rumah")
+async def rumah_command(ctx):
+    """Command !rumah untuk menampilkan informasi donasi rumah"""
+    embed = discord.Embed(
+        title="🏠 Informasi Donasi Rumah",
+        color=discord.Color.green(),
+        timestamp=discord.utils.utcnow()
+    )
+    
+    embed.add_field(
+        name="1. Pilih Rumah",
+        value="Tentukan rumah yang akan dibeli dengan mencari di IC rumah dengan **pintu terbuka**",
+        inline=False
+    )
+    
+    embed.add_field(
+        name="2. Kategori Rumah",
+        value="Rumah yang akan dibeli akan ditentukan kategori oleh manajemen termasuk small, medium, big, mansion.",
+        inline=False
+    )
+    
+    embed.add_field(
+        name="3. Harga Rumah",
+        value=(
+            "Pihak server akan menentukan harga berdasarkan kategori:\n"
+            "**Small** - Mulai dari `Rp 750,000`\n"
+            "**Medium** - Mulai dari `Rp 2,500,000`\n"
+            "**Big & Mansion** - Mulai dari `Rp 5,000,000`"
+        ),
+        inline=False
+    )
+    
+    embed.add_field(
+        name="Biaya Maintenance",
+        value="Mansion memiliki biaya maintenance **Rp 350,000/bulan**",
+        inline=False
+    )
+    
+    embed.set_footer(text="Motion County Housing Donation")
+    
+    await ctx.send(embed=embed)
 
 
 @bot.tree.command(name="delete_panel", description="Delete saved panel message ID (Admin only)")
@@ -698,3 +741,4 @@ async def admin_command_error(interaction: discord.Interaction, error):
 
 if __name__ == "__main__":
     bot.run(BOT_TOKEN)
+    
