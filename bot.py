@@ -9,14 +9,12 @@ from typing import Optional
 
 load_dotenv()
 
-# Configuration from .env
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 GUILD_ID = int(os.getenv('GUILD_ID'))
 HELPER_ROLE_ID = int(os.getenv('HELPER_ROLE_ID'))
 LOG_CHANNEL_ID = int(os.getenv('LOG_CHANNEL_ID'))
 PANEL_CHANNEL_ID = int(os.getenv('PANEL_CHANNEL_ID'))
 
-# Manageable roles
 MANAGEABLE_ROLES = {
     'GOVERNMENT': int(os.getenv('GOVERNMENT')),
     'LAWMAN': int(os.getenv('LAWMAN')),
@@ -25,7 +23,6 @@ MANAGEABLE_ROLES = {
 
 PANEL_DATA_FILE = 'panel_data.json'
 
-# Bot setup
 intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
@@ -122,7 +119,6 @@ class RoleManagementView(discord.ui.View):
         super().__init__(timeout=None)
         self.temp_data_manager = temp_data_manager
         
-        # Dropdown untuk tambah role
         give_role_options = [
             discord.SelectOption(
                 label=name,
@@ -141,7 +137,6 @@ class RoleManagementView(discord.ui.View):
         give_role_select.callback = self.role_select_callback
         self.add_item(give_role_select)
         
-        # Dropdown untuk hapus role
         remove_role_options = [
             discord.SelectOption(
                 label=name,
@@ -160,7 +155,6 @@ class RoleManagementView(discord.ui.View):
         remove_role_select.callback = self.role_select_callback
         self.add_item(remove_role_select)
         
-        # User select
         user_select = discord.ui.UserSelect(
             placeholder="Select one or more target members",
             custom_id="user_select",
@@ -178,7 +172,6 @@ class RoleManagementView(discord.ui.View):
         return is_admin or has_helper
 
     async def role_select_callback(self, interaction: discord.Interaction):
-        # Permission check
         if not self.has_permission(interaction):
             await interaction.response.send_message(
                 "❌ You don't have permission to use this panel!", 
@@ -190,7 +183,6 @@ class RoleManagementView(discord.ui.View):
         action = "give" if selected.startswith('give_') else "remove"
         role_id = int(selected.replace(f'{action}_', ''))
         
-        # Find role name
         role_name = next(
             (name for name, rid in MANAGEABLE_ROLES.items() if rid == role_id),
             "Unknown"
@@ -204,7 +196,6 @@ class RoleManagementView(discord.ui.View):
             )
             return
         
-        # Check bot permissions
         if role >= interaction.guild.me.top_role:
             await interaction.response.send_message(
                 f"❌ I cannot manage {role.mention} - it's higher than my highest role!",
@@ -212,7 +203,6 @@ class RoleManagementView(discord.ui.View):
             )
             return
         
-        # Store temp data
         self.temp_data_manager.set(interaction.user.id, {
             'role_id': role_id,
             'role_name': role_name,
@@ -227,7 +217,6 @@ class RoleManagementView(discord.ui.View):
         )
 
     async def user_select_callback(self, interaction: discord.Interaction):
-        # Permission check
         if not self.has_permission(interaction):
             await interaction.response.send_message(
                 "❌ You don't have permission to use this panel!", 
@@ -249,10 +238,8 @@ class RoleManagementView(discord.ui.View):
         action = temp_data['action']
         role = interaction.guild.get_role(role_id)
 
-        # PERBAIKAN: Defer immediately untuk menghindari timeout
         await interaction.response.defer(ephemeral=True)
 
-        # Confirmation for bulk actions (more than 3 users)
         if len(selected_user_ids) > 3:
             confirm_view = ConfirmButton()
             confirm_message = await interaction.followup.send(
@@ -268,13 +255,11 @@ class RoleManagementView(discord.ui.View):
                 await confirm_message.edit(content="❌ Action cancelled", view=None)
                 return
             
-            # Delete confirmation message
             try:
                 await confirm_message.delete()
             except:
                 pass
 
-        # Process actions
         success_list = []
         failed_list = []
 
@@ -282,12 +267,10 @@ class RoleManagementView(discord.ui.View):
             try:
                 member = await interaction.guild.fetch_member(int(user_id))
                 
-                # Check if target is bot
                 if member.bot:
                     failed_list.append(f"{member.mention} (cannot manage bots)")
                     continue
                 
-                # Check role hierarchy
                 if member.top_role >= interaction.guild.me.top_role:
                     failed_list.append(f"{member.mention} (higher role than bot)")
                     continue
@@ -312,7 +295,6 @@ class RoleManagementView(discord.ui.View):
             except Exception as e:
                 failed_list.append(f"<@{user_id}> (error: {type(e).__name__})")
 
-        # Build result embed
         summary_embed = discord.Embed(
             title=f"🔄 Bulk Role {action.capitalize()} Results",
             color=discord.Color.green() if action == "give" else discord.Color.orange(),
@@ -336,10 +318,8 @@ class RoleManagementView(discord.ui.View):
             inline=True
         )
 
-        # Send result to user
         await interaction.followup.send(embed=summary_embed, ephemeral=True)
 
-        # Send to log channel
         log_channel = interaction.guild.get_channel(LOG_CHANNEL_ID)
         if log_channel:
             try:
@@ -347,11 +327,8 @@ class RoleManagementView(discord.ui.View):
             except Exception as e:
                 print(f"❌ Failed to send log: {e}")
 
-        # Cleanup temp data
         self.temp_data_manager.delete(interaction.user.id)
 
-
-# Initialize temp data manager
 temp_data_manager = TempDataManager()
 
 
@@ -442,7 +419,6 @@ async def setup_panel(interaction: discord.Interaction):
         )
         return
 
-    # Check if panel already exists
     existing_message_id = PanelDataManager.get_message_id()
     if existing_message_id:
         try:
@@ -599,7 +575,6 @@ async def role_stats(interaction: discord.Interaction):
             total_with_roles += member_count
             percentage = (member_count / interaction.guild.member_count) * 100
             
-            # Bar visualization
             bar_length = int(percentage / 5)
             bar = "█" * bar_length + "░" * (20 - bar_length)
             
@@ -687,6 +662,37 @@ async def rumah_command(ctx):
     embed.set_footer(text="Motion County Housing Donation")
     
     await ctx.send(embed=embed)
+    
+
+@bot.command(name="formkuda")
+async def formkuda_command(ctx):
+    """Command !formkuda untuk menampilkan form informasi kuda"""
+    embed = discord.Embed(
+        title="Form Informasi Kuda",
+        description="Silakan copy dan isi form dibawah",
+        color=discord.Color.from_rgb(139, 69, 19), 
+        timestamp=discord.utils.utcnow()
+    )
+    
+    form_text = (
+        "`\n"
+        "Breed : \n"
+        "Coat : \n"
+        "Name : \n"
+        "Gender : \n"
+        "Young/Adult : \n"
+        "`"
+    )
+    
+    embed.add_field(
+        name="Form Template",
+        value=form_text,
+        inline=False
+    )
+    
+    embed.set_footer(text="Motion County Horse Donation")
+    
+    await ctx.send(embed=embed)
 
 
 @bot.tree.command(name="delete_panel", description="Delete saved panel message ID (Admin only)")
@@ -721,7 +727,6 @@ async def delete_panel(interaction: discord.Interaction):
     )
 
 
-# Error handlers
 @setup_panel.error
 @refresh_panel.error
 @delete_panel.error
