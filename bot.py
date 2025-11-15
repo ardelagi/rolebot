@@ -685,6 +685,7 @@ async def formkuda_command(ctx):
     )
     
     embed.add_field(
+        name="‎‎‎",
         value=form_text,
         inline=False
     )
