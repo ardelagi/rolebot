@@ -606,7 +606,7 @@ async def rekening_command(ctx):
     
     embed.add_field(
         name="Bank",
-        value="SMBC Indonesia",
+        value="SMBC Indonesia (BTPN jika di BRI)",
         inline=False
     )
     
@@ -655,7 +655,7 @@ async def rumah_command(ctx):
     
     embed.add_field(
         name="4. Biaya Maintenance",
-        value="Mansion memiliki biaya maintenance **Rp 350,000/bulan**",
+        value="Mansion memiliki biaya maintenance **Rp 150,000/bulan**",
         inline=False
     )
     
@@ -668,7 +668,7 @@ async def rumah_command(ctx):
 async def formkuda_command(ctx):
     """Command !formkuda untuk menampilkan form informasi kuda"""
     embed = discord.Embed(
-        title="Form Informasi Kuda",
+        title="Form Donasi Kuda",
         description="Silakan copy dan isi form dibawah",
         color=discord.Color.from_rgb(139, 69, 19), 
         timestamp=discord.utils.utcnow()
@@ -685,7 +685,6 @@ async def formkuda_command(ctx):
     )
     
     embed.add_field(
-        name="Form Template",
         value=form_text,
         inline=False
     )
